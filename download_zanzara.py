@@ -36,7 +36,7 @@ def main(start_date, end_date, verbose):
         logging.WARNING,
         logging.DEBUG,
     ]
-    log_format = '%(asctime)s - %(name)s - %(message)s'
+    log_format = '%(asctime)s - %(name)s: %(message)s'
     logger = logging.getLogger(__name__)
     verbose = min(len(levels) - 1, verbose)
     logging.basicConfig(level=levels[verbose], format=log_format)
