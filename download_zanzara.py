@@ -4,10 +4,7 @@ import click
 import requests
 import pandas as pd
 import logging
-
-
-def progress_bar(fraction):
-    return '[{0:50s}] {1:.1%}'.format('#' * int((fraction * 50)), fraction)
+from tqdm import tqdm
 
 
 @click.command()
@@ -44,13 +41,12 @@ def main(start_date, end_date, verbose):
     end_date = datetime.datetime.strptime(end_date, "%Y%m%d")
     daterange = pd.date_range(start_date, end_date)
     n = len(daterange)
-    for i, day in enumerate(daterange):
+    for day in tqdm(daterange):
         url = "http://audio.radio24.ilsole24ore.com/radio24_audio/{}/{}-lazanzara.mp3".format(
             day.strftime("%Y"), day.strftime("%y%m%d"))
         response = requests.get(url, stream=True)
         logger.debug("requested url %s", url)
         logger.debug("got %s", response)
-        logger.warning(progress_bar((i + 1) / n))
         if response.ok:
             output_path = os.path.basename(url)
             with open(os.path.basename(url), "wb") as output_file:
