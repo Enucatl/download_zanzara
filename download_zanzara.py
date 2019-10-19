@@ -14,7 +14,7 @@ from tqdm import tqdm
     help="start date (yyyymmdd)")
 @click.option(
     "--end_date",
-    default="20160220",
+    default=datetime.datetime.today().strftime("%Y%m%d"),
     help="end date (yyyymmdd)")
 @click.option(
     "-v",
