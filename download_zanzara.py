@@ -14,9 +14,9 @@ year_format = "%Y"
 try:
     latest_file = list(pathlib.Path(".").glob("*-lazanzara.mp3"))[-1]
     # add one day to the latest existing file
-    default_start_date = datetime.datetime.strptime(
+    default_start_date = (datetime.datetime.strptime(
         str(latest_file).split("-")[0], date_format
-    ) + datetime.timedelta(days=1).strftime(date_format)
+    ) + datetime.timedelta(days=1)).strftime(date_format)
 except IndexError:
     # if no files match, start from today
     default_start_date = datetime.datetime.today().strftime(date_format)
