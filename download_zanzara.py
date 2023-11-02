@@ -1,4 +1,3 @@
-import os
 import pathlib
 import click
 import datetime
@@ -86,8 +85,8 @@ def main(start_date, end_date, verbose):
         logger.debug("got %s", response)
         if response.ok:
             # Extract the output filename from the URL and save the file
-            output_path = os.path.basename(url)
-            with open(os.path.basename(url), "wb") as output_file:
+            output_path = pathlib.Path(url).name
+            with open(output_path, "wb") as output_file:
                 for chunk in response.iter_content(4096):
                     output_file.write(chunk)
             logger.debug("written %s", output_path)
