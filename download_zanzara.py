@@ -12,33 +12,26 @@ from tqdm import tqdm
 date_format = "%y%m%d"
 year_format = "%Y"
 
-try:
-    # find the latest existing file
-    latest_file = sorted(list(pathlib.Path(".").glob("*-lazanzara.mp3")))[-1]
-    # add one day to the latest existing file
-    default_start_date = (
-        datetime.datetime.strptime(str(latest_file).split("-")[0], date_format)
-        + datetime.timedelta(days=1)
-    ).strftime(date_format)
-    print(default_start_date)
-except IndexError:
-    # if no files match, start from today
-    default_start_date = datetime.datetime.today().strftime(date_format)
-
 
 @click.command()
-@click.option("--start_date", default=default_start_date, help="start date (yymmdd)")
+@click.option("--start_date", default=None, help="start date (yymmdd)")
 @click.option(
     "--end_date",
     default=datetime.datetime.today().strftime(date_format),
     help="end date (yymmdd)",
 )
 @click.option(
+    "--output_folder",
+    default=".",
+    type=click.Path(exists=True, file_okay=False, dir_okay=True, writable=True),
+    help="folder where all the files will be written",
+)
+@click.option(
     "-v",
     "--verbose",
     count=True,
 )
-def main(start_date, end_date, verbose):
+def main(start_date, end_date, output_folder, verbose):
     """
     Download audio files of 'La Zanzara' radio program.
 
@@ -49,6 +42,7 @@ def main(start_date, end_date, verbose):
     Args:
         start_date (str): The start date in the format 'yymmdd'.
         end_date (str): The end date in the format 'yymmdd'.
+        output_folder (str): Folder where all the files will be written.
         verbose (int): Verbosity level (0 for warnings, 1 for debug messages).
 
     Returns:
@@ -58,9 +52,25 @@ def main(start_date, end_date, verbose):
         To download audio files from January 1, 2022, to January 5, 2022, you can
         run the following command:
 
-        $ python download_zanzara.py --start_date 220101 --end_date 220105
+        $ python download_zanzara.py --start_date 220101 --end_date 220105 --output_folder .
 
     """
+    output_folder = pathlib.Path(output_folder)
+    try:
+        # find the latest existing file
+        latest_file = sorted(list(output_folder.glob("*-lazanzara.mp3")))[-1].name
+        # add one day to the latest existing file
+        default_start_date = (
+            datetime.datetime.strptime(str(latest_file).split("-")[0], date_format)
+            + datetime.timedelta(days=1)
+        ).strftime(date_format)
+        print(default_start_date)
+    except IndexError:
+        # if no files match, start from today
+        default_start_date = datetime.datetime.today().strftime(date_format)
+    if start_date is None:
+        start_date = default_start_date
+
     # set up logging
     levels = [
         logging.WARNING,
@@ -85,7 +95,7 @@ def main(start_date, end_date, verbose):
         logger.debug("got %s", response)
         if response.ok:
             # Extract the output filename from the URL and save the file
-            output_path = pathlib.Path(url).name
+            output_path = output_folder / pathlib.Path(url).name
             with open(output_path, "wb") as output_file:
                 for chunk in response.iter_content(4096):
                     output_file.write(chunk)
