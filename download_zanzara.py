@@ -87,9 +87,7 @@ def main(start_date, end_date, output_folder, verbose):
     daterange = pd.date_range(start_date, end_date)
     for day in tqdm(daterange):
         # Construct the URL for the audio file based on the date, by interpolating year and date
-        url = "http://audio.radio24.ilsole24ore.com/radio24_audio/{}/{}-lazanzara.mp3".format(
-            day.strftime(year_format), day.strftime(date_format)
-        )
+        url = f"https://podcast-radio24.ilsole24ore.com/radio24_audio/{day.strftime(year_format)}/{day.strftime(date_format)}-lazanzara.mp3"
         response = requests.get(url, stream=True)
         logger.debug("requested url %s", url)
         logger.debug("got %s", response)
